@@ -1,0 +1,10 @@
+const express = require('express');
+const router = express.Router();
+
+// Importe la logique métier de User
+const userCtrl = require('../controllers/user');
+
+router.post('/signup', userCtrl.signup);
+router.post('/login', userCtrl.login);
+
+module.exports = router;
