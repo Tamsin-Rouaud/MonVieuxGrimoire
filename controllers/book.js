@@ -39,7 +39,7 @@ exports.createBook = (req, res, next) => {
 				// Crée un objet Book avec l'URL de l'image redimensionnée
 				const book = new Book({
 					...bookObject,
-					
+
 					userId: req.auth.userId,
 					imageUrl: `${req.protocol}://${req.get(
 						'host'
@@ -64,7 +64,6 @@ exports.createBook = (req, res, next) => {
 // Gère la création de la notation du livre
 exports.createRatingBook = async (req, res, next) => {
 	try {
-
 		// Récupère l'identifiant de l'utilisateur via le token
 		const userId = req.auth.userId;
 		// Récupère la note fournie dans le corps de la requête
@@ -74,7 +73,6 @@ exports.createRatingBook = async (req, res, next) => {
 
 		// Vérifie si l'utilisateur a déjà noté ce livre
 		const userHasRatedBook = await Book.findOne({
-
 			_id: req.params.id,
 			'ratings.userId': userId,
 		});
@@ -104,9 +102,11 @@ exports.createRatingBook = async (req, res, next) => {
 			0
 		);
 
-		// Calcule la nouvelle note moyenne et l'attribue au livre
-		book.averageRating = totalRatings / book.ratings.length;
+		// Calcule la nouvelle note moyenne et l'arrondit à un chiffre après la virgule
+		const roundRating = totalRatings / book.ratings.length;
+		book.averageRating = roundRating.toFixed(1);
 
+		
 		// On sauvegarde le livre avec la note moyenne mise à jour
 		await book.save();
 
@@ -203,7 +203,7 @@ exports.modifyBook = (req, res, next) => {
 // Supprime un livre en fonction de l'identifiant fourni dans la requête
 exports.deleteBook = (req, res, next) => {
 	// Recherche le livre dans la base de données avec l'identifiant fourni dans la requête
-	Book.findOne( {_id: req.params.id })
+	Book.findOne({ _id: req.params.id })
 		.then((book) => {
 			// Vérifie si le user actuel est le propriétaire du livre
 			if (book.userId != req.auth.userId) {
